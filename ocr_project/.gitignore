@@ -1,0 +1,112 @@
+# Dataset - Too large for GitHub
+data/iam/
+data/iam_words/iam_words/
+data/iam_words/words/
+
+# Add all data folders (root and subfolders)
+data/
+../data/
+data/iam_test/
+data/iam_test/iam_words/
+data/iam_test/iam_words/words/
+data/iam_test/words_new.txt
+
+# Model files - Too large
+saved_models/*.h5
+saved_models/*.keras
+saved_models/*.weights.h5
+saved_models/logs/
+saved_models/kaggle/
+
+# Add all model files
+saved_models/
+*.h5
+*.keras
+*.weights.h5
+*.pth
+*.ckpt
+*.pt
+
+# Training logs
+*.csv
+training_*.csv
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Debug output
+debug_output/
+*.log
+
+# Debug output subfolders
+debug_output/compare/
+debug_output/crops/
+debug_output/exports/
+debug_output/strategies/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+notebooks/.ipynb_checkpoints/
+
+# Virtual environment
+venv/
+env/
+ENV/
+.venv
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Zip files
+*.zip
+
+# Kaggle and workspace artifacts
+fullpage_iam_workspace/data/
+fullpage_iam_workspace/code/
+fullpage_iam_workspace/notebooks/
+fullpage_iam_workspace/scripts/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Miscellaneous
+*.tar.gz
+*.tar
+*.bak
+*.old
+
+# Sample images (if large)
+sample_images/*.png
+sample_images/*.jpg
+
+# Keep these important files (override above rules)
+!data/iam_words/splits/*.csv
+!README.md
+!requirements.txt
+
+# Local environment
+.venv/
+
+# Debug files
+training_log.txt
+debug_visualization.png
+debug_ocr.py
+debug_predictions.py
+EMERGENCY_FIX.txt
+
+# Ignore all __pycache__
+__pycache__/

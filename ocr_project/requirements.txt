@@ -1,0 +1,42 @@
+# ============================================================
+# OCR Project - Requirements
+# Install with: pip install -r requirements.txt
+#
+# For Google Colab training, these are pre-installed except
+# a few extras listed at the bottom.
+# ============================================================
+
+# Deep Learning
+tensorflow>=2.12.0,<2.21.0   # Core ML framework (Keras built-in)
+
+# Image Processing
+opencv-python>=4.7.0          # Image read, resize, threshold, contours
+Pillow>=9.0.0                 # PIL - additional image utilities
+scikit-image>=0.20.0          # Skeletonization, advanced morphology
+
+# Numerical & Data
+numpy>=1.23.0                 # Array operations (backbone of everything)
+pandas>=1.5.0                 # Handling label CSV files
+
+# Visualization
+matplotlib>=3.6.0             # Plot training curves, show images
+seaborn>=0.12.0               # Prettier plots for metrics
+
+# Utilities
+tqdm>=4.64.0                  # Progress bars during training/loading
+scipy>=1.10.0                 # Gaussian filters, signal processing
+
+# System
+psutil>=5.9.0                 # RAM monitoring during training
+requests>=2.28.0              # Downloading dataset files
+
+# Optional: for beam search decoding
+# pip install ctc_decoder      # Install separately if needed
+
+# PDF & Printed Text OCR
+pdfplumber>=0.10.0            # Extract text from digital PDFs
+pytesseract>=0.3.10           # Python wrapper for Tesseract OCR engine
+gradio>=4.0.0                 # Web interface for OCR app
+# NOTE: Tesseract must also be installed on the system:
+#   Windows: https://github.com/UB-Mannheim/tesseract/wiki
+#   Ubuntu:  sudo apt install tesseract-ocr

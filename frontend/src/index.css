@@ -1,0 +1,50 @@
+@import url('https://api.fontshare.com/v2/css?f[]=switzer@400,500,600,700,800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-background: #F6F3ED;
+  --color-primary: #313851;
+  --color-secondary: #C2CBD3;
+  --color-accent: #6366F1;
+  --color-accent-dark: #4F46E5;
+  
+  --radius-card: 20px;
+  
+  --shadow-soft: 0 4px 20px -2px rgba(49, 56, 81, 0.08);
+}
+
+@layer base {
+  body {
+    background-color: var(--color-background);
+    color: var(--color-primary);
+    font-family: 'Switzer', sans-serif;
+    -webkit-font-smoothing: antialiased;
+
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer components {
+  .card-container {
+    background-color: white;
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-soft);
+    padding: 1.5rem;
+    width: 100%;
+    max-width: 26rem; /* Slightly narrower for better focus */
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  @media (min-width: 640px) {
+    .card-container {
+      padding: 2.5rem;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .card-container {
+      padding: 3rem;
+    }
+  }
+}

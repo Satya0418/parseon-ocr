@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OCR Model Check</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="page">
+      <section class="card">
+        <h1>OCR Model Check</h1>
+        <p>Use separate flows for handwritten images and PDFs, then compare extracted data.</p>
+
+        <div class="panels">
+          <article class="panel">
+            <h2>Handwritten</h2>
+            <label for="handwrittenInput" class="upload-label">Choose handwritten image</label>
+            <input id="handwrittenInput" type="file" accept="image/*" />
+
+            <div class="preview-wrap">
+              <img id="handwrittenPreview" alt="Handwritten preview" />
+            </div>
+
+            <button id="predictHandwrittenBtn" disabled>Extract Handwritten</button>
+
+            <div class="result" id="handwrittenResult">
+              <p><strong>Show:</strong> <span id="handwrittenPrediction">-</span></p>
+              <p><strong>Extracted Data:</strong></p>
+              <pre id="handwrittenExtracted" class="extracted-box">-</pre>
+              <p><strong>Details:</strong> <span id="handwrittenDetails">-</span></p>
+            </div>
+          </article>
+
+          <article class="panel">
+            <h2>PDF</h2>
+            <label for="pdfInput" class="upload-label">Choose PDF</label>
+            <input id="pdfInput" type="file" accept="application/pdf" />
+
+            <div class="preview-wrap pdf-hint">
+              <p>PDF preview is optional. Extraction runs page by page.</p>
+            </div>
+
+            <button id="predictPdfBtn" disabled>Extract PDF</button>
+
+            <div class="result" id="pdfResult">
+              <p><strong>Show:</strong> <span id="pdfShow">-</span></p>
+              <p><strong>Extracted Data:</strong></p>
+              <pre id="pdfExtracted" class="extracted-box">-</pre>
+              <p><strong>Details:</strong> <span id="pdfDetails">-</span></p>
+              <p><strong>Page Outputs:</strong></p>
+              <pre id="pdfPageOutputs" class="extracted-box">-</pre>
+            </div>
+          </article>
+        </div>
+
+        <p class="hint">Tip: test clear handwriting and noisy images to gauge where retraining is needed.</p>
+      </section>
+    </main>
+    <script src="/static/app.js?v=3"></script>
+  </body>
+</html>

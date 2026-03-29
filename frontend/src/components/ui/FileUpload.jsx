@@ -16,66 +16,60 @@ const FileUpload = ({ onSelectFile, selectedFileId }) => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
   };
 
-  const simulateUploadAndProcessing = (id) => {
-    const documentTypes = [
-      { type: 'Invoice', classes: 'bg-blue-100 text-blue-700 border-blue-200' },
-      { type: 'Prescription', classes: 'bg-green-100 text-green-700 border-green-200' },
-      { type: 'Receipt', classes: 'bg-orange-100 text-orange-700 border-orange-200' },
-      { type: 'Other', classes: 'bg-gray-100 text-gray-700 border-gray-200' }
-    ];
-
-    let currentProgress = 0;
-    const uploadInterval = setInterval(() => {
-      currentProgress += Math.floor(Math.random() * 15) + 15;
-      if (currentProgress >= 100) {
-        currentProgress = 100;
-        clearInterval(uploadInterval);
-        setFiles(prev => prev.map(f => f.id === id ? { ...f, progress: 100, status: 'processing' } : f));
-        
-        // Simulate Processing delay (AI extraction)
-        setTimeout(() => {
-          // 15% chance to fail
-          if (Math.random() < 0.15) {
-            setFiles(prev => prev.map(f => f.id === id ? { ...f, status: 'failed' } : f));
-            return;
-          }
-
-          const randomType = documentTypes[Math.floor(Math.random() * documentTypes.length)];
-          const mockData = {
-            type: randomType.type.toLowerCase(),
-            amount: '$' + (Math.floor(Math.random() * 5000) + 100).toFixed(2),
-            date: new Date().toISOString().split('T')[0],
-            vendor: ["Acme Corp", "TechFlow Inc.", "Global Services", "HealthPlus"][Math.floor(Math.random() * 4)],
-            status: "verified",
-            confidenceLevel: "98%"
-          };
-          setFiles(prev => prev.map(f => f.id === id ? { ...f, status: 'done', classification: randomType, extractedData: mockData } : f));
-        }, 3000 + Math.random() * 2000);
-      } else {
-        setFiles(prev => prev.map(f => f.id === id ? { ...f, progress: currentProgress } : f));
-      }
-    }, 400);
-  };
-
-  const processFiles = useCallback((newFiles) => {
+  // Send files to backend for OCR
+  const processFiles = useCallback(async (newFiles) => {
     const validFiles = Array.from(newFiles).filter(file => {
-      return file.type.startsWith('image/') || 
-             file.type === 'application/pdf' ||
-             file.type.includes('word') || 
-             file.type.includes('document');
+      return (
+        file.type.startsWith('image/') ||
+        file.type === 'application/pdf' ||
+        file.type.includes('word') ||
+        file.type.includes('document')
+      );
     });
-    
+    if (validFiles.length === 0) return;
+
+    // Add files to UI as uploading
     const newFileObjects = validFiles.map(file => ({
       id: Math.random().toString(36).substring(7),
       file,
       status: 'uploading',
       progress: 0
     }));
-
     setFiles(prev => [...prev, ...newFileObjects]);
 
-    // Start simulation for each valid file
-    newFileObjects.forEach(f => simulateUploadAndProcessing(f.id));
+    // Prepare FormData for multi-upload
+    const formData = new FormData();
+    validFiles.forEach(f => formData.append('files', f));
+
+    // Update status to processing
+    setFiles(prev => prev.map(f => newFileObjects.find(nf => nf.id === f.id) ? { ...f, status: 'processing', progress: 100 } : f));
+
+    try {
+      const response = await fetch('/predict-multi', {
+        method: 'POST',
+        body: formData
+      });
+      const data = await response.json();
+      if (data && Array.isArray(data.results)) {
+        setFiles(prev => prev.map(f => {
+          const result = data.results.find(r => r.filename === f.file.name);
+          if (!result) return f;
+          if (result.error) {
+            return { ...f, status: 'failed', error: result.error };
+          }
+          return {
+            ...f,
+            status: 'done',
+            extractedData: result,
+            classification: { type: 'OCR', classes: 'bg-blue-100 text-blue-700 border-blue-200' }
+          };
+        }));
+      } else {
+        setFiles(prev => prev.map(f => ({ ...f, status: 'failed', error: 'No OCR result' })));
+      }
+    } catch (err) {
+      setFiles(prev => prev.map(f => ({ ...f, status: 'failed', error: 'Server error' })));
+    }
   }, []);
 
   const onDragOver = (e) => {

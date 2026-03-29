@@ -1,4 +1,48 @@
-from __future__ import annotations
+import os
+from io import BytesIO
+from pathlib import Path
+import numpy as np
+import pypdfium2 as pdfium
+import tensorflow as tf
+from fastapi import FastAPI, File, HTTPException, UploadFile, Query
+from typing import List
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
+from PIL import Image, ImageOps
+
+# --- FastAPI app definition and static mounts (must be before any route decorators) ---
+app = FastAPI(title="OCR Model Checker", version="1.0.0")
+app.mount("/static", StaticFiles(directory=Path(__file__).resolve().parent / "static"), name="static")
+# Serve ocr_project/debug_output/exports as /exports
+EXPORTS_PATH = Path(__file__).resolve().parent.parent / "ocr_project" / "debug_output" / "exports"
+app.mount("/exports", StaticFiles(directory=EXPORTS_PATH), name="exports")
+# Serve ocr_project/data as /data
+DATA_PATH = Path(__file__).resolve().parent.parent / "ocr_project" / "data"
+app.mount("/data", StaticFiles(directory=DATA_PATH), name="data")
+# Serve ocr_project/notebooks as /notebooks
+NOTEBOOKS_PATH = Path(__file__).resolve().parent.parent / "ocr_project" / "notebooks"
+app.mount("/notebooks", StaticFiles(directory=NOTEBOOKS_PATH), name="notebooks")
+# Serve ocr_project/saved_models as /saved_models
+SAVED_MODELS_PATH = Path(__file__).resolve().parent.parent / "ocr_project" / "saved_models"
+app.mount("/saved_models", StaticFiles(directory=SAVED_MODELS_PATH), name="saved_models")
+
+# List files in a directory endpoint
+@app.get("/list-files")
+def list_files(path: str = Query(..., description="Subdirectory to list, e.g. 'exports', 'data', 'notebooks', 'saved_models'")):
+    base_dirs = {
+        "exports": EXPORTS_PATH,
+        "data": DATA_PATH,
+        "notebooks": NOTEBOOKS_PATH,
+        "saved_models": SAVED_MODELS_PATH,
+    }
+    if path not in base_dirs:
+        return {"error": f"Unknown path: {path}"}
+    dir_path = base_dirs[path]
+    try:
+        files = os.listdir(dir_path)
+        return {"files": files}
+    except Exception as e:
+        return {"error": str(e)}
 
 from io import BytesIO
 from pathlib import Path
@@ -7,6 +51,29 @@ import numpy as np
 import pypdfium2 as pdfium
 import tensorflow as tf
 from fastapi import FastAPI, File, HTTPException, UploadFile
+from typing import List
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
+from PIL import Image, ImageOps
+
+# --- FastAPI app definition and static mounts (must be before any route decorators) ---
+app = FastAPI(title="OCR Model Checker", version="1.0.0")
+app.mount("/static", StaticFiles(directory=Path(__file__).resolve().parent / "static"), name="static")
+# Serve ocr_project/debug_output/exports as /exports
+EXPORTS_PATH = Path(__file__).resolve().parent.parent / "ocr_project" / "debug_output" / "exports"
+app.mount("/exports", StaticFiles(directory=EXPORTS_PATH), name="exports")
+
+# Serve ocr_project/data as /data
+DATA_PATH = Path(__file__).resolve().parent.parent / "ocr_project" / "data"
+app.mount("/data", StaticFiles(directory=DATA_PATH), name="data")
+
+# Serve ocr_project/notebooks as /notebooks
+NOTEBOOKS_PATH = Path(__file__).resolve().parent.parent / "ocr_project" / "notebooks"
+app.mount("/notebooks", StaticFiles(directory=NOTEBOOKS_PATH), name="notebooks")
+
+# Serve ocr_project/saved_models as /saved_models
+SAVED_MODELS_PATH = Path(__file__).resolve().parent.parent / "ocr_project" / "saved_models"
+app.mount("/saved_models", StaticFiles(directory=SAVED_MODELS_PATH), name="saved_models")
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from PIL import Image, ImageOps
@@ -20,10 +87,14 @@ ALPHABET = (
 
 IMG_HEIGHT = 64
 IMG_WIDTH = 256
-MODEL_PATH = Path(__file__).resolve().parent.parent / "ocr_project" / "crnn_iam_v1_inference.keras"
+MODEL_PATH = Path(__file__).resolve().parent.parent / "ocr_project" / "saved_models" / "crnn_iam_v1_inference.keras"
 
 app = FastAPI(title="OCR Model Checker", version="1.0.0")
 app.mount("/static", StaticFiles(directory=Path(__file__).resolve().parent / "static"), name="static")
+
+# Serve ocr_project/debug_output/exports as /exports
+EXPORTS_PATH = Path(__file__).resolve().parent.parent / "ocr_project" / "debug_output" / "exports"
+app.mount("/exports", StaticFiles(directory=EXPORTS_PATH), name="exports")
 
 
 class OCRService:
@@ -198,3 +269,4 @@ async def predict_pdf(file: UploadFile = File(...)) -> dict[str, object]:
         "extracted_text": "\n".join(extracted_lines),
         "page_results": page_results,
     }
+from __future__ import annotations
